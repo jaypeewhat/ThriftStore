@@ -147,7 +147,7 @@ export default function OrderDetailPage() {
             </div>
             <div className="flex gap-3 items-center">
               <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
-                {order.status === 'cancel_requested' ? 'Cancel Requested' : order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                {(order.status as string) === 'cancel_requested' ? 'Cancel Requested' : order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </span>
               {(order.status === 'pending' || order.status === 'confirmed') && (
                 <button
@@ -158,7 +158,7 @@ export default function OrderDetailPage() {
                   {cancelling ? 'Requesting...' : 'Request Cancel'}
                 </button>
               )}
-              {order.status === 'cancel_requested' && (
+              {(order.status as string) === 'cancel_requested' && (
                 <span className="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm font-semibold">
                   Awaiting Seller Approval
                 </span>

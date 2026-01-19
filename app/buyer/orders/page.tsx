@@ -206,7 +206,7 @@ export default function OrdersPage() {
                             {cancellingOrderId === order.id ? 'Requesting...' : 'Request Cancel'}
                           </button>
                         )}
-                        {order.status === 'cancel_requested' && (
+                        {(order.status as string) === 'cancel_requested' && (
                           <span className="px-2 sm:px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                             Awaiting Approval
                           </span>
