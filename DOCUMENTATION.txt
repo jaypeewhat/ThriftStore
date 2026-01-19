@@ -1,0 +1,665 @@
+================================================================================
+                    UKAYUKAY THRIFT SHOP - BEGINNER'S GUIDE
+================================================================================
+
+Ito yung guide kung paano namin binuild yung UkayUkay step by step.
+Para sa mga beginners 'to, so simple lang yung explanations.
+
+================================================================================
+                         ANO BA 'TONG PROJECT NA 'TO?
+================================================================================
+
+UkayUkay is an online thrift shop kung saan:
+- BUYERS pwedeng mag-browse at bumili ng second-hand clothes/items
+- SELLERS pwedeng mag-post ng mga items nila for sale
+- ADMIN pwedeng mag-manage ng buong platform
+
+Parang Shopee or Lazada siya, pero for ukay-ukay items lang.
+
+
+================================================================================
+                    TECH STACK (MGA TOOLS NA GINAMIT NAMIN)
+================================================================================
+
+Ano ba yung "Tech Stack"?
+-------------------------
+Tech stack yung combination ng mga technologies/tools na ginamit sa pag-build ng app.
+Parang ingredients sa recipe - bawat tool may kanya-kanyang purpose.
+
+
+YUNG TECH STACK NAMIN:
+----------------------
+
+1. NEXT.JS (Frontend Framework)
+   Ano 'to: Tool para mag-build ng websites gamit React
+   Bakit namin ginamit: 
+   - Super easy lang mag-build ng web pages
+   - May built-in routing na (yung mga pages like /shop, /login, etc.)
+   - Ang bilis at SEO-friendly
+   Website: nextjs.org
+
+2. TYPESCRIPT (Programming Language)
+   Ano 'to: JavaScript pero may dagdag na features
+   Bakit namin ginamit:
+   - Nakaka-catch ng errors bago pa i-run yung code
+   - Nakikita mo kung anong klaseng data yung expected
+   - Mas madaling maintindihan yung code
+   Example: Imbes na "name" lang, sasabihin mo "name: string" (dapat text)
+
+3. TAILWIND CSS (Styling)
+   Ano 'to: Tool para gawing maganda yung website
+   Bakit namin ginamit:
+   - Pwede ka mag-CSS directly sa HTML using class names
+   - Di mo na need gumawa ng separate CSS files
+   - Ang bilis lang gumawa ng magandang UI
+   Example: <button class="bg-blue-500 text-white p-4">Click Me</button>
+
+4. SUPABASE (Backend Service)
+   Ano 'to: Service na nagbibigay ng database, authentication, at storage
+   Bakit namin ginamit:
+   - Di na kailangan gumawa ng sariling server
+   - May free tier pa!
+   - Ang dali lang gamitin
+   - Real-time updates (para sa live chat)
+   
+   Ito yung binibigay ng Supabase satin:
+   - DATABASE: Kung saan nakastore lahat ng data (users, products, orders)
+   - AUTHENTICATION: Yung login/signup system
+   - STORAGE: Kung saan nakastore yung mga product images
+   - REALTIME: Live updates para sa chat at notifications
+   
+   Website: supabase.com
+
+5. ZUSTAND (State Management)
+   Ano 'to: Tool para mag-share ng data between components
+   Bakit namin ginamit:
+   - Mas simple kaysa Redux
+   - Madali lang aralin
+   - Naka-keep yung user login state kahit lumipat ng page
+   Example: Pag nag-login yung user, alam na ng lahat ng pages na logged in siya
+
+6. REACT HOT TOAST (Notifications)
+   Ano 'to: Nagpapakita ng popup messages
+   Bakit namin ginamit:
+   - Super easy mag-show ng success/error messages
+   - Ang ganda tignan
+   Example: "Added to cart!" popup
+
+7. LUCIDE REACT (Icons)
+   Ano 'to: Library ng mga icons
+   Bakit namin ginamit:
+   - Free icons
+   - Madali gamitin
+   - Pwedeng i-customize yung size at color
+   Example: Shopping cart icon, heart icon, etc.
+
+
+================================================================================
+                    STEP 1: SETTING UP YUNG PROJECT
+================================================================================
+
+Ito yung ginawa namin:
+----------------------
+
+1. Binuksan yung terminal (Command Prompt / PowerShell)
+
+2. Nag-run ng command na 'to para gumawa ng project:
+   
+   npx create-next-app@latest ukayukay --typescript --tailwind
+   
+   Gagawa 'to ng bagong folder na "ukayukay" kung saan:
+   - Naka-install na yung Next.js
+   - Configured na yung TypeScript
+   - Ready na yung Tailwind CSS
+
+3. Binuksan yung folder sa VS Code:
+   
+   cd ukayukay
+   code .
+
+4. Nag-install ng additional packages:
+   
+   npm install @supabase/supabase-js zustand react-hot-toast lucide-react
+   
+   Ito yung na-add:
+   - @supabase/supabase-js = Para makapag-connect sa Supabase
+   - zustand = State management
+   - react-hot-toast = Popup notifications
+   - lucide-react = Icons
+
+
+================================================================================
+                    STEP 2: SETTING UP NG SUPABASE
+================================================================================
+
+Ito yung ginawa namin:
+----------------------
+
+1. Pumunta sa supabase.com tapos gumawa ng free account
+
+2. Gumawa ng new project:
+   - Click "New Project"
+   - Nilagay yung project name: "ukayukay"
+   - Nag-set ng database password (i-save mo 'to ha!)
+   - Pumili ng region (piliin yung pinaka-malapit sayo)
+
+3. Kinuha yung API keys:
+   - Pumunta sa Settings > API
+   - Kinopya yung "Project URL" 
+   - Kinopya yung "anon public" key
+
+4. Gumawa ng .env.local file sa project folder:
+   
+   NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   
+   (Palitan mo ng actual values mo)
+
+5. Gumawa ng lib/supabase.ts file:
+   
+   import { createClient } from '@supabase/supabase-js'
+   
+   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+   
+   export const supabase = createClient(supabaseUrl, supabaseKey)
+
+   Ito yung gumagawa ng connection sa database natin.
+
+
+================================================================================
+                    STEP 3: PAGGAWA NG DATABASE TABLES
+================================================================================
+
+Ano ba yung Database Table?
+---------------------------
+Isipin mo parang Excel spreadsheet.
+Bawat table nag-store ng isang klase ng information.
+Bawat row isang item.
+Bawat column isang property.
+
+Example: PRODUCTS table
+| id  | title        | price | seller_id |
+|-----|--------------|-------|-----------|
+| 1   | Blue Shirt   | 50    | user123   |
+| 2   | Red Dress    | 100   | user456   |
+
+
+Ito yung mga tables na ginawa namin:
+------------------------------------
+
+1. PROFILES - Nag-store ng user information
+   - id (unique identifier)
+   - email
+   - role (buyer, seller, or admin)
+   - full_name
+   - avatar_url (profile picture)
+   - is_suspended (true/false)
+
+2. PRODUCTS - Nag-store ng mga items for sale
+   - id
+   - seller_id (sino nagbebenta)
+   - title
+   - description
+   - price
+   - category (Tops, Bottoms, etc.)
+   - size (S, M, L, XL)
+   - condition (Like New, Good, Fair)
+   - images (array ng image URLs)
+   - is_available (true/false)
+
+3. CART_ITEMS - Nag-store ng shopping cart
+   - id
+   - user_id (kanino yung cart)
+   - product_id (anong product)
+   - quantity (ilan)
+
+4. ORDERS - Nag-store ng purchases
+   - id
+   - buyer_id
+   - seller_id
+   - product_id
+   - total_amount
+   - status (pending, confirmed, shipped, delivered)
+
+5. WISHLIST - Nag-store ng mga saved items
+   - id
+   - user_id
+   - product_id
+
+6. MESSAGES - Nag-store ng chat messages
+   - id
+   - sender_id
+   - receiver_id
+   - content
+   - is_read
+
+7. NOTIFICATIONS - Nag-store ng alerts
+   - id
+   - user_id
+   - title
+   - message
+   - is_read
+
+8. RATINGS - Nag-store ng product reviews
+   - id
+   - product_id
+   - buyer_id
+   - rating (1-5 stars)
+   - comment
+
+
+Paano gumawa ng tables:
+-----------------------
+
+1. Punta sa Supabase Dashboard
+2. Click "SQL Editor" sa left side
+3. I-paste yung SQL code from supabase-schema.sql
+4. Click "Run"
+
+Kasama yung SQL file sa project folder.
+
+
+================================================================================
+                    STEP 4: PAGGAWA NG PAGES
+================================================================================
+
+Paano gumagana yung Next.js Pages:
+----------------------------------
+Sa Next.js, folder structure = URL structure
+
+app/
+├── page.tsx          -> localhost:3000/
+├── shop/
+│   └── page.tsx      -> localhost:3000/shop
+├── auth/
+│   ├── login/
+│   │   └── page.tsx  -> localhost:3000/auth/login
+│   └── signup/
+│       └── page.tsx  -> localhost:3000/auth/signup
+
+Gumawa ka lang ng folder tapos lagyan mo ng page.tsx sa loob!
+
+
+Mga pages na ginawa namin:
+--------------------------
+
+AUTHENTICATION (Login/Signup):
+- /app/auth/login/page.tsx - Login form
+- /app/auth/signup/page.tsx - Registration form
+- /app/auth/verify-email/page.tsx - Email verification message
+- /app/auth/forgot-password/page.tsx - Para mag-request ng password reset
+- /app/auth/reset-password/page.tsx - Para mag-set ng bagong password
+
+BUYER PAGES:
+- /app/shop/page.tsx - Pag-browse ng lahat ng products
+- /app/product/[id]/page.tsx - Single product details
+- /app/buyer/cart/page.tsx - Shopping cart
+- /app/buyer/checkout/page.tsx - Checkout form
+- /app/buyer/orders/page.tsx - Order history
+- /app/buyer/wishlist/page.tsx - Mga na-save na items
+- /app/buyer/profile/page.tsx - Edit profile
+
+SELLER PAGES:
+- /app/seller/dashboard/page.tsx - Seller home (stats, orders)
+- /app/seller/products/new/page.tsx - Mag-add ng bagong product
+- /app/seller/products/edit/[id]/page.tsx - Edit product
+- /app/seller/profile/page.tsx - Edit store info
+
+ADMIN PAGES:
+- /app/admin/dashboard/page.tsx - Admin controls
+
+
+Ano yung [id]?
+--------------
+Yung [id] ay dynamic route.
+Ibig sabihin, pwedeng kahit anong value yung URL.
+
+Example:
+/product/[id]/page.tsx
+
+Pwede siyang ma-access bilang:
+- /product/123
+- /product/abc
+- /product/anything
+
+Sa code, kinukuha natin yung id value para i-fetch yung specific product na yun.
+
+
+================================================================================
+                    STEP 5: PAGGAWA NG COMPONENTS
+================================================================================
+
+Ano ba yung Component?
+----------------------
+Component ay reusable piece ng UI.
+Imbes na kopyahin yung code, gagawin mo lang siya once tapos gagamitin mo kahit saan.
+
+Example: ProductCard component
+- Nagpapakita ng product image, title, price
+- Ginagamit sa shop page, wishlist, etc.
+- I-change mo lang once, mag-update lahat
+
+Mga components na ginawa namin:
+-------------------------------
+
+1. Navbar.tsx
+   - Yung navigation bar sa taas
+   - Iba-iba yung links depende sa role ng user
+   - May sign out button
+
+2. ProductCard.tsx
+   - Nagdi-display ng isang product
+   - May wishlist heart button
+   - May add to cart button
+   - May "SOLD" badge pag sold out na
+
+3. ProductGrid.tsx
+   - Nagdi-display ng products in grid layout
+   - Ginagamit yung ProductCard for each item
+
+4. AuthProvider.tsx
+   - Naka-wrap sa buong app
+   - Nag-che-check kung logged in yung user
+   - Nag-che-check kung suspended yung user
+   - Naglo-load ng user data pag start ng app
+
+5. ChatModal.tsx
+   - Popup chat window
+   - Real-time messaging with seller
+
+6. NotificationBell.tsx
+   - Bell icon sa navbar
+   - Nagpapakita ng notification count
+   - Dropdown list ng notifications
+
+7. RatingModal.tsx
+   - Popup para mag-rate ng product
+   - Star rating (1-5)
+   - Comment box
+
+
+================================================================================
+                    STEP 6: AUTHENTICATION FLOW
+================================================================================
+
+Paano mag-Sign Up yung Users:
+-----------------------------
+
+1. Finifill-upan ng user yung form (email, password, name, role)
+
+2. Tinatawag natin yung Supabase:
+   supabase.auth.signUp({
+     email: 'user@email.com',
+     password: 'password123',
+     options: {
+       data: { full_name: 'John', role: 'buyer' }
+     }
+   })
+
+3. Gagawan ng Supabase ng user sa auth.users table
+
+4. Yung database trigger natin automatically gumagawa ng profile
+
+5. Supabase magse-send ng verification email
+
+6. Click ng user yung link sa email
+
+7. Pwede na mag-login yung user
+
+
+Paano mag-Log In yung Users:
+----------------------------
+
+1. Nilalagay ng user yung email at password
+
+2. Tinatawag natin yung Supabase:
+   supabase.auth.signInWithPassword({
+     email: 'user@email.com',
+     password: 'password123'
+   })
+
+3. Nag-che-check tayo kung suspended yung user:
+   - Kung suspended -> show error, wag payagang mag-login
+
+4. Nire-redirect natin based sa role:
+   - Admin -> /admin/dashboard
+   - Seller -> /seller/dashboard
+   - Buyer -> /shop
+
+
+Paano gumagana yung Password Reset:
+-----------------------------------
+
+1. Cini-click ng user yung "Forgot password?" sa login page
+
+2. Nilalagay ng user yung email sa forgot-password page
+
+3. Tinatawag natin:
+   supabase.auth.resetPasswordForEmail(email)
+
+4. Supabase magse-send ng reset email
+
+5. Cini-click ng user yung link sa email
+
+6. Nakaland yung user sa reset-password page
+
+7. Nilalagay ng user yung bagong password
+
+8. Tinatawag natin:
+   supabase.auth.updateUser({ password: newPassword })
+
+9. Na-update na yung password! Redirect na sa login.
+
+
+================================================================================
+                    STEP 7: MGA PROBLEMS NA NA-FIX NAMIN
+================================================================================
+
+PROBLEM 1: Hindi gumagana yung Login (infinite recursion error)
+---------------------------------------------------------------
+Anong nangyari: Pagkatapos mag-login, stuck sa loading
+Error message: "infinite recursion detected in policy"
+
+Bakit nangyari: 
+- Yung Row Level Security (RLS) nag-che-check ng user profile
+- Para ma-check yung profile, kailangan naka-login
+- Para maka-login, kailangan i-check yung profile
+- Infinite loop!
+
+Paano namin na-fix:
+Nag-run nito sa Supabase SQL Editor:
+   ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
+
+
+PROBLEM 2: Wishlist nagpapakita ng 406 errors
+---------------------------------------------
+Anong nangyari: Console nagpapakita ng maraming 406 Not Acceptable errors
+
+Bakit nangyari:
+- Yung RLS policies sa wishlist table sobrang strict
+
+Paano namin na-fix:
+Nag-run nito sa Supabase SQL Editor:
+   ALTER TABLE wishlist DISABLE ROW LEVEL SECURITY;
+
+
+PROBLEM 3: Hindi magawa yung user as admin
+------------------------------------------
+Anong nangyari: Error pag sineset yung role as 'admin'
+Error message: "violates check constraint profiles_role_check"
+
+Bakit nangyari:
+- Yung database 'buyer' at 'seller' lang yung allowed roles
+
+Paano namin na-fix:
+Nag-run nito sa Supabase SQL Editor:
+   ALTER TABLE profiles DROP CONSTRAINT profiles_role_check;
+   ALTER TABLE profiles ADD CONSTRAINT profiles_role_check 
+     CHECK (role IN ('buyer', 'seller', 'admin'));
+
+
+PROBLEM 4: Naka-suspend na users nakaka-gamit pa rin ng app
+-----------------------------------------------------------
+Anong nangyari: Pagkatapos i-suspend yung user, nakaka-browse pa rin siya
+
+Bakit nangyari:
+- Walang code na nag-che-check kung suspended yung user
+
+Paano namin na-fix:
+- Nag-add ng check sa AuthProvider.tsx (nagsa-sign out ng suspended users)
+- Nag-add ng check sa login page (nagba-block ng suspended users)
+
+
+PROBLEM 5: Admin nakaka-access ng shop parang buyer
+---------------------------------------------------
+Anong nangyari: Nakaka-browse ng shop yung admin, nakaka-add to cart, etc.
+
+Bakit nangyari:
+- Walang restrictions for admin role
+
+Paano namin na-fix:
+- Nag-add ng redirect sa /shop page (kung admin, punta sa dashboard)
+- Nag-add ng redirect sa home page (kung admin, punta sa dashboard)
+- Tinago yung "Shop" link sa navbar for admin
+
+
+================================================================================
+                    STEP 8: PAG-DEPLOY NG APP
+================================================================================
+
+Ano ba yung Deployment?
+-----------------------
+Deployment means pinapalagay mo yung website mo sa internet
+para kahit sino pwedeng i-access gamit yung URL.
+
+
+Ginamit namin yung Vercel (free hosting):
+-----------------------------------------
+
+1. Ni-push yung code sa GitHub:
+   git add .
+   git commit -m "Initial commit"
+   git push
+
+2. Pumunta sa vercel.com
+
+3. Cini-click yung "Add New Project"
+
+4. Pinili yung GitHub repo
+
+5. Nilagay yung environment variables:
+   - NEXT_PUBLIC_SUPABASE_URL
+   - NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+6. Cini-click yung "Deploy"
+
+7. Nakakuha ng URL na parang: ukayukay.vercel.app
+
+
+Pagkatapos mag-deploy:
+----------------------
+1. Ni-update yung Supabase settings:
+   - Settings > Authentication > URL Configuration
+   - Pinaltan yung Site URL sa Vercel URL
+   - Nag-add ng Vercel URL sa Redirect URLs
+
+Kailangan 'to para gumana yung email links ng maayos.
+
+
+================================================================================
+                    QUICK REFERENCE COMMANDS
+================================================================================
+
+Para mag-start ng development server:
+   npm run dev
+   (Magbu-bukas sa localhost:3000)
+
+Para mag-install ng bagong package:
+   npm install package-name
+
+Para mag-push sa GitHub:
+   git add .
+   git commit -m "your message"
+   git push
+
+Para gawing admin yung user (Supabase SQL):
+   UPDATE profiles SET role = 'admin' WHERE email = 'user@email.com';
+
+Para i-disable yung RLS sa table (Supabase SQL):
+   ALTER TABLE table_name DISABLE ROW LEVEL SECURITY;
+
+
+================================================================================
+                    PROJECT FILES OVERVIEW
+================================================================================
+
+ukayukay/
+├── app/                    <- Lahat ng pages dito
+│   ├── page.tsx           <- Home page (/)
+│   ├── layout.tsx         <- Main layout (naka-wrap sa lahat ng pages)
+│   ├── globals.css        <- Global styles
+│   ├── admin/             <- Admin pages
+│   ├── auth/              <- Login/signup pages
+│   ├── buyer/             <- Buyer pages
+│   ├── seller/            <- Seller pages
+│   ├── shop/              <- Shop page
+│   └── product/           <- Product detail page
+│
+├── components/            <- Reusable components
+│   ├── Navbar.tsx
+│   ├── ProductCard.tsx
+│   ├── AuthProvider.tsx
+│   └── ...
+│
+├── lib/                   <- Utility files
+│   ├── supabase.ts       <- Database connection
+│   └── store.ts          <- State management
+│
+├── public/               <- Static files (images, etc.)
+│
+├── .env.local            <- Environment variables (SECRET 'to ha!)
+├── package.json          <- Project dependencies
+├── tailwind.config.ts    <- Tailwind settings
+└── tsconfig.json         <- TypeScript settings
+
+
+================================================================================
+                    TIPS PARA SA MGA BEGINNERS
+================================================================================
+
+1. ARALIN MO MUNA YUNG BASICS
+   - HTML, CSS, JavaScript
+   - Tapos React
+   - Tapos Next.js
+
+2. GAMITIN MO YUNG CONSOLE.LOG
+   Pag may hindi gumagana:
+   console.log(variable)
+   Tignan mo sa browser console (F12) para makita yung values
+
+3. BASAHIN MO YUNG ERROR MESSAGES
+   Sinasabi ng errors kung ano yung problema
+   I-Google mo yung error message
+
+4. MAGSIMULA KA SA MALIIT
+   Wag mong subukang intindihin lahat agad
+   Focus ka muna sa isang feature at a time
+
+5. GAMITIN MO YUNG DOCUMENTATION
+   - Next.js: nextjs.org/docs
+   - Supabase: supabase.com/docs
+   - Tailwind: tailwindcss.com/docs
+
+6. MAG-PRACTICE KA!
+   Habang mas marami kang code, mas gagaling ka
+
+
+================================================================================
+                         END OF GUIDE
+================================================================================
+
+May tanong ka? Ang best way to learn is mag-experiment!
+Subukan mong i-change yung kahit ano tapos tignan mo kung anong mangyayari.
+
+Last Updated: January 20, 2026
