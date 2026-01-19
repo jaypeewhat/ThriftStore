@@ -59,7 +59,7 @@ export default function WishlistPage() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setItems((data || []) as WishlistItem[])
+      setItems((data || []) as unknown as WishlistItem[])
     } catch (error) {
       console.error('Error fetching wishlist:', error)
       toast.error('Failed to load wishlist')
