@@ -53,7 +53,7 @@ export interface Order {
   seller_id: string
   product_id: string
   total_amount: number
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'cancel_requested'
   shipping_address?: string
   phone?: string
   notes?: string
