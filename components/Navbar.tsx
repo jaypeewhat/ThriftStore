@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuthStore, useCartStore } from '@/lib/store'
 import { supabase } from '@/lib/supabase'
-import { ShoppingBag, User, LogOut, Menu, X, Heart, Store } from 'lucide-react'
+import { ShoppingBag, User, LogOut, Menu, X, Heart, Store, Shield } from 'lucide-react'
 import toast from 'react-hot-toast'
 import NotificationBell from './NotificationBell'
 
@@ -38,11 +38,19 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-thrift-dark hover:text-thrift-gray transition-colors font-medium">
-              Shop
-            </Link>
+            {(!user || user.role !== 'admin') && (
+              <Link href="/shop" className="text-thrift-dark hover:text-thrift-gray transition-colors font-medium">
+                Shop
+              </Link>
+            )}
             {user && (
               <>
+                {user.role === 'admin' && (
+                  <Link href="/admin/dashboard" className="text-thrift-dark hover:text-thrift-gray transition-colors font-medium flex items-center gap-1">
+                    <Shield className="w-4 h-4" />
+                    Admin
+                  </Link>
+                )}
                 {user.role === 'seller' && (
                   <Link href="/seller/dashboard" className="text-thrift-dark hover:text-thrift-gray transition-colors font-medium">
                     My Store
@@ -75,7 +83,7 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center space-x-4">
                 <NotificationBell userId={user.id} />
-                <Link href={user.role === 'seller' ? '/seller/profile' : '/buyer/profile'}>
+                <Link href={user.role === 'admin' ? '/admin/dashboard' : user.role === 'seller' ? '/seller/profile' : '/buyer/profile'}>
                   <button className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors">
                     <User className="w-5 h-5" />
                     <span>{user.full_name}</span>
@@ -118,11 +126,18 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t">
           <div className="px-4 py-4 space-y-4">
-            <Link href="/" className="block text-gray-700 hover:text-primary-600" onClick={() => setMobileMenuOpen(false)}>
-              Shop
-            </Link>
+            {(!user || user.role !== 'admin') && (
+              <Link href="/shop" className="block text-gray-700 hover:text-primary-600" onClick={() => setMobileMenuOpen(false)}>
+                Shop
+              </Link>
+            )}
             {user && (
               <>
+                {user.role === 'admin' && (
+                  <Link href="/admin/dashboard" className="block text-gray-700 hover:text-primary-600" onClick={() => setMobileMenuOpen(false)}>
+                    <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Admin Dashboard</span>
+                  </Link>
+                )}
                 {user.role === 'seller' && (
                   <Link href="/seller/dashboard" className="block text-gray-700 hover:text-primary-600" onClick={() => setMobileMenuOpen(false)}>
                     My Store
@@ -141,7 +156,7 @@ export default function Navbar() {
                     </Link>
                   </>
                 )}
-                <Link href={user.role === 'seller' ? '/seller/profile' : '/buyer/profile'} className="block text-gray-700 hover:text-primary-600" onClick={() => setMobileMenuOpen(false)}>
+                <Link href={user.role === 'admin' ? '/admin/dashboard' : user.role === 'seller' ? '/seller/profile' : '/buyer/profile'} className="block text-gray-700 hover:text-primary-600" onClick={() => setMobileMenuOpen(false)}>
                   Profile
                 </Link>
                 <button

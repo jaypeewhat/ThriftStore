@@ -6,7 +6,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Database types
-export type UserRole = 'buyer' | 'seller'
+export type UserRole = 'buyer' | 'seller' | 'admin'
 
 export interface Profile {
   id: string
@@ -20,6 +20,7 @@ export interface Profile {
   postal_code?: string
   store_name?: string
   store_description?: string
+  is_suspended?: boolean
   created_at: string
 }
 

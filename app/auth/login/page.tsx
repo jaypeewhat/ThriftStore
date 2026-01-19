@@ -25,19 +25,29 @@ export default function LoginPage() {
 
       if (error) throw error
 
-      // Fetch user profile to determine role
+      // Fetch user profile to determine role and check suspension
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, is_suspended')
           .eq('id', session.user.id)
           .single()
+
+        // Check if user is suspended
+        if (profile?.is_suspended) {
+          await supabase.auth.signOut()
+          toast.error('Your account has been suspended. Please contact support.')
+          setLoading(false)
+          return
+        }
 
         toast.success('Welcome back!')
         
         // Redirect based on role
-        if (profile?.role === 'seller') {
+        if (profile?.role === 'admin') {
+          router.push('/admin/dashboard')
+        } else if (profile?.role === 'seller') {
           router.push('/seller/dashboard')
         } else {
           router.push('/shop')
@@ -99,6 +109,11 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 required
               />
+            </div>
+            <div className="mt-2 text-right">
+              <Link href="/auth/forgot-password" className="text-sm text-thrift-gray hover:text-thrift-dark transition-colors">
+                Forgot password?
+              </Link>
             </div>
           </div>
 

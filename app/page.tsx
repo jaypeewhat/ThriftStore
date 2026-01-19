@@ -18,7 +18,9 @@ export default function Home() {
   useEffect(() => {
     // If user is logged in, redirect based on role
     if (!isLoading && user) {
-      if (user.role === 'seller') {
+      if (user.role === 'admin') {
+        router.push('/admin/dashboard')
+      } else if (user.role === 'seller') {
         router.push('/seller/dashboard')
       } else {
         router.push('/shop')

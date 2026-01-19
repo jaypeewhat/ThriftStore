@@ -1,10 +1,13 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore, useCartStore } from '@/lib/store'
+import toast from 'react-hot-toast'
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
   const { setUser, setIsLoading } = useAuthStore()
   const { loadCart, clearCart } = useCartStore()
 
@@ -51,6 +54,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       }
       
       if (data) {
+        // Check if user is suspended
+        if (data.is_suspended) {
+          await supabase.auth.signOut()
+          setUser(null)
+          clearCart()
+          toast.error('Your account has been suspended. Please contact support.')
+          router.push('/auth/login')
+          return
+        }
+        
         setUser(data)
         // Load cart for buyers
         if (data.role === 'buyer') {

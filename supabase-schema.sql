@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT UNIQUE NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('buyer', 'seller')),
+  role TEXT NOT NULL CHECK (role IN ('buyer', 'seller', 'admin')),
   full_name TEXT NOT NULL,
   avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -49,12 +49,23 @@ CREATE TABLE orders (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Wishlist table
+CREATE TABLE wishlist (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, product_id)
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_products_seller ON products(seller_id);
 CREATE INDEX idx_products_available ON products(is_available);
 CREATE INDEX idx_cart_user ON cart_items(user_id);
 CREATE INDEX idx_orders_buyer ON orders(buyer_id);
 CREATE INDEX idx_orders_seller ON orders(seller_id);
+CREATE INDEX idx_wishlist_user ON wishlist(user_id);
+CREATE INDEX idx_wishlist_product ON wishlist(product_id);
 
 -- Row Level Security (RLS) Policies
 

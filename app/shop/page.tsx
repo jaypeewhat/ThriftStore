@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import ProductGrid from '@/components/ProductGrid'
 import { supabase, Product } from '@/lib/supabase'
+import { useAuthStore } from '@/lib/store'
 import { Loader2, Search, SlidersHorizontal } from 'lucide-react'
 
 const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Others']
@@ -11,6 +13,8 @@ const SIZES = ['All', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size']
 const CONDITIONS = ['All', 'Like New', 'Excellent', 'Good', 'Fair']
 
 export default function ShopPage() {
+  const router = useRouter()
+  const { user } = useAuthStore()
   const [products, setProducts] = useState<Product[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -21,8 +25,13 @@ export default function ShopPage() {
   const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
+    // Redirect admin to dashboard
+    if (user?.role === 'admin') {
+      router.push('/admin/dashboard')
+      return
+    }
     fetchProducts()
-  }, [])
+  }, [user])
 
   useEffect(() => {
     applyFilters()
