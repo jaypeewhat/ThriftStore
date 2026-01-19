@@ -215,12 +215,19 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Store Name */}
           {product.seller && (
-            <div className="flex items-center gap-1 mb-2 text-thrift-gray">
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                router.push(`/store/${product.seller_id}`)
+              }}
+              className="flex items-center gap-1 mb-2 text-thrift-gray hover:text-thrift-dark transition-colors"
+            >
               <Store className="w-3.5 h-3.5" />
-              <span className="text-xs truncate">
+              <span className="text-xs truncate hover:underline">
                 {(product.seller as any).store_name || product.seller.full_name}
               </span>
-            </div>
+            </button>
           )}
           
           <div className="flex items-center justify-between mb-3">

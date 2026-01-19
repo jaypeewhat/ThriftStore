@@ -149,12 +149,12 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-thrift-gray">
                     <span>Shipping</span>
-                    <span className="text-thrift-dark">FREE</span>
+                    <span className="text-thrift-gray text-sm">Calculated at checkout</span>
                   </div>
                   <div className="border-t pt-3">
                     <div className="flex justify-between text-xl font-bold text-thrift-dark">
-                      <span>Total</span>
-                      <span>₱{total.toFixed(2)}</span>
+                      <span>Estimated Total</span>
+                      <span>₱{total.toFixed(2)}+</span>
                     </div>
                   </div>
                 </div>

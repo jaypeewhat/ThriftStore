@@ -75,7 +75,17 @@ function VerifyEmailContent() {
             </div>
             <div>
               <p className="font-semibold text-thrift-dark">Open your email</p>
-              <p className="text-sm text-thrift-gray">Check your inbox (and spam folder)</p>
+              <p className="text-sm text-thrift-gray">Check your inbox for our verification email</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 text-left">
+            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-white text-sm font-bold">!</span>
+            </div>
+            <div>
+              <p className="font-semibold text-thrift-dark">Check your spam folder</p>
+              <p className="text-sm text-thrift-gray">Sometimes emails end up in Spam or Junk folder</p>
             </div>
           </div>
           

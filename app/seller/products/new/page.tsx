@@ -23,6 +23,7 @@ export default function NewProductPage() {
     title: '',
     description: '',
     price: '',
+    shipping_fee: '',
     category: CATEGORIES[0],
     size: SIZES[2],
     condition: CONDITIONS[0],
@@ -100,6 +101,7 @@ export default function NewProductPage() {
         title: formData.title,
         description: formData.description,
         price: parseFloat(formData.price),
+        shipping_fee: parseFloat(formData.shipping_fee) || 0,
         category: formData.category,
         size: formData.size,
         condition: formData.condition,
@@ -214,6 +216,23 @@ export default function NewProductPage() {
                 min="0"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="0.00"
+                required
+              />
+            </div>
+
+            {/* Shipping Fee */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Shipping Fee (₱) - Set to 0 for free shipping
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.shipping_fee}
+                onChange={(e) => setFormData({ ...formData, shipping_fee: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="0.00"
                 required

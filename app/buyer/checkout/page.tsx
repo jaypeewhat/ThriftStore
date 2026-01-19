@@ -201,7 +201,11 @@ export default function CheckoutPage() {
     }
   }
 
-  const total = cartItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
+  const shippingFee = formData.delivery_method === 'delivery' 
+    ? cartItems.reduce((sum, item) => sum + (item.product?.shipping_fee || 0), 0)
+    : 0
+  const total = subtotal + shippingFee
 
   if (isLoading || loading) {
     return (
@@ -222,7 +226,7 @@ export default function CheckoutPage() {
         <h1 className="text-2xl sm:text-4xl font-bold text-thrift-dark mb-6 sm:mb-8">Checkout</h1>
 
         <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-2 lg:order-1">
             <form onSubmit={handleSubmit} className="glass rounded-2xl shadow-lg p-4 sm:p-6 space-y-6">
               <div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-thrift-dark mb-4">Order Details</h2>
@@ -401,25 +405,47 @@ export default function CheckoutPage() {
             </form>
           </div>
 
-          <div className="lg:col-span-1">
-            <div className="glass rounded-2xl shadow-lg p-6 sticky top-8">
-              <h2 className="text-xl font-semibold text-thrift-dark mb-4">Order Summary</h2>
+          <div className="lg:col-span-1 order-1 lg:order-2">
+            <div className="glass rounded-2xl shadow-lg p-4 sm:p-6 lg:sticky lg:top-24">
+              <h2 className="text-lg sm:text-xl font-semibold text-thrift-dark mb-4">Order Summary</h2>
               
-              <div className="space-y-3 mb-4">
+              <div className="space-y-3 mb-4 max-h-48 overflow-y-auto">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span className="text-thrift-gray">
-                      {item.product?.title} (x{item.quantity})
-                    </span>
-                    <span className="font-medium text-thrift-dark">
-                      ₱{((item.product?.price || 0) * item.quantity).toFixed(2)}
-                    </span>
+                  <div key={item.id} className="text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-thrift-gray truncate pr-2 flex-1">
+                        {item.product?.title} (x{item.quantity})
+                      </span>
+                      <span className="font-medium text-thrift-dark whitespace-nowrap">
+                        ₱{((item.product?.price || 0) * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                    {formData.delivery_method === 'delivery' && (item.product?.shipping_fee || 0) > 0 && (
+                      <div className="flex justify-between text-xs text-thrift-gray mt-1">
+                        <span className="pl-2">+ Shipping</span>
+                        <span>₱{(item.product?.shipping_fee || 0).toFixed(2)}</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
 
-              <div className="border-t pt-4 mb-6">
-                <div className="flex justify-between text-lg font-semibold">
+              <div className="border-t pt-4 mb-4 sm:mb-6 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-thrift-gray">Subtotal</span>
+                  <span className="text-thrift-dark">₱{subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-thrift-gray">Shipping</span>
+                  <span className="text-thrift-dark">
+                    {shippingFee === 0 ? (
+                      <span className="text-green-600">Free</span>
+                    ) : (
+                      `₱${shippingFee.toFixed(2)}`
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                   <span className="text-thrift-dark">Total</span>
                   <span className="text-thrift-dark">₱{total.toFixed(2)}</span>
                 </div>
@@ -428,7 +454,7 @@ export default function CheckoutPage() {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="w-full btn-primary disabled:opacity-50"
+                className="w-full btn-primary disabled:opacity-50 text-sm sm:text-base py-3"
               >
                 {submitting ? (
                   <>
@@ -442,7 +468,7 @@ export default function CheckoutPage() {
 
               <button
                 onClick={() => router.push('/buyer/cart')}
-                className="w-full btn-outline mt-3"
+                className="w-full btn-outline mt-3 text-sm sm:text-base"
               >
                 Back to Cart
               </button>

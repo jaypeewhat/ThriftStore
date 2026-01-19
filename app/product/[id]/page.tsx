@@ -269,7 +269,10 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Seller/Store Info */}
-            <div className="glass rounded-xl p-4">
+            <div 
+              onClick={() => router.push(`/store/${product.seller_id}`)}
+              className="glass rounded-xl p-4 cursor-pointer hover:shadow-lg transition-shadow"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-thrift-dark rounded-full flex items-center justify-center">
@@ -277,7 +280,7 @@ export default function ProductDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm text-thrift-gray">Sold by</p>
-                    <p className="font-semibold text-thrift-dark">
+                    <p className="font-semibold text-thrift-dark hover:underline">
                       {(product.seller as any)?.store_name || product.seller?.full_name || 'Unknown Store'}
                     </p>
                   </div>
@@ -295,6 +298,7 @@ export default function ProductDetailPage() {
                   {(product.seller as any).store_description}
                 </p>
               )}
+              <p className="text-xs text-thrift-sage mt-2 text-center">Click to view store →</p>
             </div>
 
             {/* Action Buttons */}

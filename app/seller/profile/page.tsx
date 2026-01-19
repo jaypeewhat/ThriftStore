@@ -176,13 +176,13 @@ export default function SellerProfile() {
             <div className="glass rounded-3xl p-6 text-center">
               {/* Avatar */}
               <div className="relative w-32 h-32 mx-auto mb-4">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-thrift-light border-4 border-white shadow-lg">
+                <div className="relative w-32 h-32 rounded-full overflow-hidden bg-thrift-light border-4 border-white shadow-lg">
                   {profile?.avatar_url ? (
                     <Image
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${profile.avatar_url}`}
                       alt="Avatar"
                       fill
-                      className="object-cover"
+                      className="object-cover rounded-full"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-thrift-dark text-white text-4xl font-bold">

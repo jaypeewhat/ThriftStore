@@ -90,6 +90,14 @@ export default function SellerDashboard() {
 
   const fetchStats = async () => {
     try {
+      // Fetch products count directly from database
+      const { data: productsData, error: productsError } = await supabase
+        .from('products')
+        .select('id, is_available')
+        .eq('seller_id', user!.id)
+
+      if (productsError) throw productsError
+
       const { data: orders, error } = await supabase
         .from('orders')
         .select('total_amount')
@@ -99,10 +107,11 @@ export default function SellerDashboard() {
       if (error) throw error
 
       const revenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0
-      const activeCount = products.filter(p => p.is_available).length
+      const totalProducts = productsData?.length || 0
+      const activeCount = productsData?.filter(p => p.is_available).length || 0
 
       setStats({
-        totalProducts: products.length,
+        totalProducts: totalProducts,
         totalRevenue: revenue,
         activeListings: activeCount,
       })

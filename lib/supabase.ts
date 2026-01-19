@@ -29,6 +29,7 @@ export interface Product {
   title: string
   description: string
   price: number
+  shipping_fee: number
   category: string
   size: string
   condition: string
